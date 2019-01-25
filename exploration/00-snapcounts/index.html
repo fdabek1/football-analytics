@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Snap Counts</title>
+    <!-- // <script type="text/javascript" src="../d3.v3.js"></script> -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+    <style type="text/css">
+
+        html, body, * {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            font-size: 14px 65%;
+        }
+
+        div#title {
+            width: 880px;
+            margin: 10px auto 0;
+            padding: 5px 20px;
+            background-color: grey;
+            border: 1px solid grey;
+            color: white;
+            box-shadow: 3px 0px 3px lightgrey;
+        }
+
+        h1 {
+            font-family: Georgia, serif;
+            font-size: 1.4em;
+            letter-spacing: 1px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            font-size: .8em;
+            font-weight: 100;
+            margin: .3em auto;
+        }
+
+        div#chart {
+            width: 920px;
+            margin: 0 auto 1em;
+            border: 1px solid grey;
+            box-shadow: 3px 3px 3px lightgrey;
+        }
+
+        .bar.positive {
+            fill: darkred;
+        }
+
+        .bar.negative {
+            fill: steelblue;
+        }
+
+        g.infowin {
+            fill: grey;
+        }
+
+        g.infowin text,
+        .axis text {
+            font: 11px sans-serif;
+            fill: grey;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+
+        path.domain {
+            stroke: none;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="allTeams">
+</div>
+<div id="chart"></div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<script type="text/javascript">
+
+    var teams = ['ARI', 'ATL', 'BAL', 'BUF', 'CAR', 'CHI', 'CIN', 'CLE', 'DAL', 'DEN', 'DET', 'GNB', 'HOU', 'IND', 'JAX', 'KAN', 'LAC', 'MIA', 'MIN', 'NOR', 'NWE', 'NYG', 'NYJ', 'OAK', 'PHI', 'PIT', 'RAM', 'SEA', 'SFO', 'TAM', 'TEN', 'WAS'];
+
+    d3.json("data.json", function (error, allData) {
+        console.log(allData);
+        var divAll = $('#allTeams');
+
+        // drawTeam(allData['BAL']);
+        teams.forEach(function(team) {
+            console.log('drawing', team);
+            divAll.append('<div>' + team + '<br><div id="chart' + team + '"></div></div>');
+            drawTeam(team, allData[team]);
+        });
+    });
+
+    function drawTeam(name, data) {
+        console.log(data);
+        var margin = {
+                top: 10,
+                right: 10,
+                bottom: 20,
+                left: 30
+            },
+            width = 920 - margin.left - margin.right,
+            height = 400 - margin.top - margin.bottom;
+
+        var y = d3.scale.linear()
+            .range([height, 0]);
+
+        var x = d3.scale.ordinal()
+            .rangeRoundBands([0, width], 0.1);
+
+        var bins = ['0', '1', '2', '3', '4', '5', '6', '7', '8-10', '10-13', '14+'];
+
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom");
+
+        var yAxis = d3.svg.axis()
+            .scale(y)
+            .orient("left");
+
+        var svg = d3.select("#chart" + name).append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+        x.domain(bins);
+        y.domain([-0.4, 0.4]).nice();
+
+
+        svg.selectAll(".bar")
+            .data(data)
+            .enter().append("rect")
+            .attr("class", function (d) {
+                if (d.Value < 0) {
+                    return "bar negative";
+                } else {
+                    return "bar positive";
+                }
+            })
+            .attr("title", function (d) {
+                return (d.Bin + ": " + d.Value + " °C")
+            })
+            .attr("y", function (d) {
+                if (d.Value > 0) {
+                    return y(d.Value);
+                } else {
+                    return y(0);
+                }
+            })
+            .attr("x", function (d) {
+                return x(d.Bin) + margin.left;
+            })
+            .attr("width", x.rangeBand())
+            .attr("height", function (d) {
+                return Math.abs(y(d.Value) - y(0));
+            })
+            .on("mouseover", function (d) {
+                // alert("Bin: " + d.Bin + ": " + d.Value + " Value");
+                d3.select("#_yr")
+                    .text("Bin: " + d.Bin);
+                d3.select("#degrree")
+                    .text((d.Value * 100).toFixed(2) + "%");
+            });
+
+        svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
+
+        svg.append("g")
+            .attr("class", "y axis")
+            .append("text")
+            .text("")
+            .attr("transform", "translate(15, 40), rotate(-90)");
+
+        svg.append("g")
+            .attr("class", "X axis")
+            .attr("transform", "translate(" + (margin.left - 6.5) + "," + height + ")")
+            .call(xAxis);
+
+        svg.append("g")
+            .attr("class", "x axis")
+            .append("line")
+            .attr("y1", y(0))
+            .attr("y2", y(0))
+            .attr("x2", width);
+
+        svg.append("g")
+            .attr("class", "infowin")
+            .attr("transform", "translate(50, 5)")
+            .append("text")
+            .attr("id", "_yr");
+
+        svg.append("g")
+            .attr("class", "infowin")
+            .attr("transform", "translate(110, 5)")
+            .append("text")
+            .attr("id", "degrree");
+
+    }
+</script>
+
+</body>
+</html>
