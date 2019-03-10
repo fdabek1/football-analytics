@@ -66,6 +66,7 @@ def calculate_conversion_percentages():
             for distance in range(1, 47):
                 print(down, distance)
                 df_sub = df[(df['down'] == down) & (df['ydstogo'] == distance)]
+                df_sub = df_sub[df_sub['play_type'] != 'punt']
                 if key == 'no_goal_line':
                     df_sub = df_sub[df_sub['goal_to_go'] == 0]
 
