@@ -1,4 +1,4 @@
-from first_down_percentages import get_clean_percentages_dict
+from exploration.e03_ordered_outcomes.first_down_percentages import get_clean_percentages_dict
 import pandas as pd
 
 
