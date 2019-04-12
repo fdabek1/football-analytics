@@ -26,9 +26,11 @@ def rank_plays(df):
     turnovers = df[
         (df['fourth_down_failed'] == 1) | (df['interception'] == 1) | (df['safety'] == 1) | (df['fumble_lost'] == 1)]
 
-    # All plays that aren't turnovers - Conversion Percentage lowest to highest
+    # All plays that aren't turnovers - Delta Conversion Percentage lowest to highest
     other_plays = df[~df.index.isin(turnovers.index)]
-    other_plays = other_plays.sort_values(['ConversionPercentage', 'yards_gained'], ascending=[True, False])
+    other_plays = other_plays.sort_values(
+        ['DeltaPercentage', 'yards_gained', 'ConversionPercentage'], ascending=[True, False, True]
+    )
     indices = other_plays.index.tolist()
     df_original.loc[indices, 'RankMethod'] = 'RegularPlay'
     new_indices += indices
@@ -44,6 +46,29 @@ def rank_plays(df):
     print('Should be 0', len(df))
 
     return df_original.reindex(new_indices)
+
+
+def compute_delta_percentage(df):
+    df['DeltaPercentage'] = -9
+    df.loc[
+        ((df['touchdown'] == 1) & (df['td_team'] == df['posteam']))
+        |
+        (df['first_down_rush'] == 1) | (df['first_down_pass'] == 1) | (df['first_down_penalty'] == 1)
+        |
+        (df['fourth_down_failed'] == 1) | (df['interception'] == 1) | (df['safety'] == 1) | (df['fumble_lost'] == 1),
+        'DeltaPercentage'] = -1
+
+    print(df.columns)
+    for index, row in df.iterrows():
+        if row['DeltaPercentage'] == -9:
+            print(row['series_num'])
+            if row['series_num'] != df.iloc[index + 1]['series_num']:
+                print('for some reason not equal')
+            df.loc[[index], 'DeltaPercentage'] = df.iloc[index + 1]['ConversionPercentage'] - row['ConversionPercentage']
+
+    print('count', df[df['DeltaPercentage'] == -9].shape)
+
+    return df
 
 
 def main():
@@ -63,6 +88,7 @@ def main():
     df = df[~((df['play_type'] == 'punt') & (df['penalty'] == 0))]
 
     df['ConversionPercentage'] = df.apply(lambda row: conversion_percentages[row['down']][row['ydstogo']], axis=1)
+    df = compute_delta_percentage(df)
 
     df = rank_plays(df)
     df = df[[
