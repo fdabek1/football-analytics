@@ -23,8 +23,11 @@ def rank_plays(df):
     new_indices += indices
     df = df.drop(indices)
 
-    turnovers = df[
-        (df['fourth_down_failed'] == 1) | (df['interception'] == 1) | (df['safety'] == 1) | (df['fumble_lost'] == 1)]
+    turnovers = df[(df['fourth_down_failed'] == 1) |
+                   (df['interception'] == 1) |
+                   (df['safety'] == 1) |
+                   (df['fumble_lost'] == 1) |
+                   (df['play_type'] == 'field_goal')]  # TODO - Does field goal count as a turnover?
 
     # All plays that aren't turnovers - Delta Conversion Percentage lowest to highest
     other_plays = df[~df.index.isin(turnovers.index)]
@@ -49,6 +52,7 @@ def rank_plays(df):
 
 
 def compute_delta_percentage(df):
+    # print(df['series_num'])
     df['DeltaPercentage'] = -9
     df.loc[
         ((df['touchdown'] == 1) & (df['td_team'] == df['posteam']))
@@ -61,10 +65,11 @@ def compute_delta_percentage(df):
     print(df.columns)
     for index, row in df.iterrows():
         if row['DeltaPercentage'] == -9:
-            print(row['series_num'])
-            if row['series_num'] != df.iloc[index + 1]['series_num']:
-                print('for some reason not equal')
-            df.loc[[index], 'DeltaPercentage'] = df.iloc[index + 1]['ConversionPercentage'] - row['ConversionPercentage']
+            # print(row['series_num'])
+            # if row['series_num'] != df.iloc[index + 1]['series_num']:
+            #     print('for some reason not equal')
+            df.loc[[index], 'DeltaPercentage'] = df.iloc[index + 1]['ConversionPercentage'] - row[
+                'ConversionPercentage']
 
     print('count', df[df['DeltaPercentage'] == -9].shape)
 
@@ -86,6 +91,9 @@ def main():
 
     # Remove punts
     df = df[~((df['play_type'] == 'punt') & (df['penalty'] == 0))]
+
+    # Remove field_goals
+    df = df[~(df['play_type'] == 'field_goal')]
 
     df['ConversionPercentage'] = df.apply(lambda row: conversion_percentages[row['down']][row['ydstogo']], axis=1)
     df = compute_delta_percentage(df)

@@ -34,7 +34,7 @@ def calculate_conversion_percentages():
                 # df.loc[begin_series_index:index - 1, 'series_num'] = series_num
                 # df.loc[begin_series_index:index - 1, 'series_success'] = False
                 df.loc[begin_series_index:index - 1, 'series_delete'] = True
-                print('delete', df.loc[begin_series_index:index - 1][['qtr', 'time']])
+                # print('delete', df.loc[begin_series_index:index - 1][['qtr', 'time']])
                 begin_series_index = index
                 # series_num += 1
 
@@ -43,7 +43,7 @@ def calculate_conversion_percentages():
                 or row['touchdown'] == 1:
             df.loc[begin_series_index:index, 'series_num'] = series_num
             df.loc[begin_series_index:index, 'series_success'] = True
-            print('success', df.loc[begin_series_index:index][['qtr', 'time']])
+            # print('success', df.loc[begin_series_index:index][['qtr', 'time']])
             begin_series_index = index + 1
             series_num += 1
 
@@ -53,7 +53,7 @@ def calculate_conversion_percentages():
                 row['play_type'] == 'field_goal':
             df.loc[begin_series_index:index, 'series_num'] = series_num
             df.loc[begin_series_index:index, 'series_success'] = False
-            print('fail', df.loc[begin_series_index:index][['qtr', 'time']])
+            # print('fail', df.loc[begin_series_index:index][['qtr', 'time']])
             begin_series_index = index + 1
             series_num += 1
 
