@@ -53,7 +53,10 @@ def rank_plays(df):
 
 def compute_delta_percentage(df):
     # print(df['series_num'])
+    # Set all to -9
     df['DeltaPercentage'] = -9
+
+    # These are the plays that indicate end of series so their Delta will be not be calculated
     df.loc[
         ((df['touchdown'] == 1) & (df['td_team'] == df['posteam']))
         |

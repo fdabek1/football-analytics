@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>ATS Venn Diagram</title>
+    <style>
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        #venn {
+            text-align: center;
+        }
+
+        .venntooltip {
+            position: absolute;
+            text-align: center;
+            width: 128px;
+            height: 16px;
+            background: #000000;
+            color: #ffffff;
+            padding: 2px;
+            border: 1px solid #9E7C0C;
+            border-radius: 8px;
+            opacity: 0;
+        }
+    </style>
+
+    <link rel="stylesheet" href="remodal.css">
+    <link rel="stylesheet" href="remodal-default-theme.css">
+</head>
+
+<body>
+
+<div>
+<!--    Sack: The standard NFL scoring and definition of a sack (simplified here), which means the QB intends to pass, but-->
+<!--    instead fumbles, runs out of bounds, or is otherwise tackled for a loss or no gain.-->
+
+<!--    Quarterback Hit (QH): It’s very common, even for members of the media to refer to these as “Quarterback Hurries”.-->
+<!--    However, the category refers specifically to times where the QB is knocked to the ground. Most, but not all sacks-->
+<!--    are QHs. At present I do not believe the NFL categorizes QHs as an official statistic, but they are recorded in the-->
+<!--    Gamebook. As a warning, QHs recorded in the Gamebook are notoriously spotty and I have only seen them in official-->
+<!--    corrections when the play is also a sack for which credit is changing. The NFL does not award half QHs as they do-->
+<!--    for sacks, so on shared sacks, each player is credited with a full QH.-->
+<!--    -->
+<!--    Ample Time and Space (ATS): This is an unofficial statistic of my definition, which occurs when the QB has 3 full-->
+<!--    seconds to throw and the ability to step into the throw in an arc 60 degrees to either side of the intended path of-->
+<!--    the throw. The ball is also not batted down at the line of scrimmage within the 3 second period.-->
+
+</div>
+<div id="venn"></div>
+
+<!--<i>*There is no scoring for ATS if the QB runs for a gain, the play results in a penalty which negates the play, the QB-->
+<!--    spikes the football at the snap to stop the clock, or the pass play is run from a scrimmage kick formation.</i>-->
+
+
+<div data-remodal-id="sack">
+    <button data-remodal-action="close" class="remodal-close"></button>
+    <h1>Sack</h1>
+    <p>
+        Like <b>Sack + ATS</b>, the QB either fumbles or runs out of bounds, but does not go down (so not a QH).
+        However, the play is slow-developing, so it is also ATS.
+    </p>
+    <div style='position:relative; padding-bottom:calc(53.07% + 44px)'>
+        <iframe src='https://gfycat.com/ifr/DarkArcticBoubou' frameborder='0' scrolling='no' width='100%' height='100%'
+                style='position:absolute;top:0;left:0;' allowfullscreen></iframe>
+    </div>
+    <br>
+    <button data-remodal-action="confirm" class="remodal-confirm">Close</button>
+</div>
+
+
+<div data-remodal-id="hit">
+    <button data-remodal-action="close" class="remodal-close"></button>
+    <h1>QB Hit</h1>
+    <p>
+        These are the most common type of sacks. The QB goes to the ground (making it a QH) and the initial pressure
+        develops such that the play is not ATS.
+    </p>
+    <div style='position:relative; padding-bottom:calc(53.07% + 44px)'>
+        <iframe src='https://gfycat.com/ifr/DarkArcticBoubou' frameborder='0' scrolling='no' width='100%' height='100%'
+                style='position:absolute;top:0;left:0;' allowfullscreen></iframe>
+    </div>
+    <br>
+    <button data-remodal-action="confirm" class="remodal-confirm">Close</button>
+</div>
+
+
+<div data-remodal-id="not_ats">
+    <button data-remodal-action="close" class="remodal-close"></button>
+    <h1>Not ATS</h1>
+    <p>
+        This is a broad category where the QB does not have 3 seconds and the space to step into his throw 60 degrees to
+        either side of the intended target. Yet in these cases, the QB was not knocked down or sacked by any of the
+        means described in A, C, or E above. Often this means a pass rusher has entered the pocket or driven his
+        assignment into the pocket, intruding upon the area required for ATS. It also occurs if the scorer judged the
+        pocket would not have held up for the full 3 seconds if the ball is delivered quickly or on a short pass. Most
+        screen passes fall into the latter category and are scored as “Ball Out Quick” (BOQ).
+    </p>
+    <div style='position:relative; padding-bottom:calc(53.07% + 44px)'>
+        <iframe src='https://gfycat.com/ifr/DarkArcticBoubou' frameborder='0' scrolling='no' width='100%' height='100%'
+                style='position:absolute;top:0;left:0;' allowfullscreen></iframe>
+    </div>
+    <br>
+    <button data-remodal-action="confirm" class="remodal-confirm">Close</button>
+</div>
+
+<div data-remodal-id="sack_hit">
+    <button data-remodal-action="close" class="remodal-close"></button>
+    <h1>Sack + QB Hit</h1>
+    <p>
+        This is a sack that is slow-developing. The QB is taken to the ground, since it’s also a QH, but I have scored
+        the play as ATS.
+    </p>
+    <div style='position:relative; padding-bottom:calc(53.07% + 44px)'>
+        <iframe src='https://gfycat.com/ifr/DarkArcticBoubou' frameborder='0' scrolling='no' width='100%' height='100%'
+                style='position:absolute;top:0;left:0;' allowfullscreen></iframe>
+    </div>
+    <br>
+    <button data-remodal-action="confirm" class="remodal-confirm">Close</button>
+</div>
+
+<div data-remodal-id="sack_ats">
+    <button data-remodal-action="close" class="remodal-close"></button>
+    <h1>Sack + Not ATS</h1>
+    <p>
+        On this subset of sacks, the QB either fumbles or runs out of bounds for a loss or no gain, but is not knocked
+        down (thus no QH), however, the initial pressure develops such that the play is not ATS.
+    </p>
+    <div style='position:relative; padding-bottom:calc(53.07% + 44px)'>
+        <iframe src='https://gfycat.com/ifr/DarkArcticBoubou' frameborder='0' scrolling='no' width='100%' height='100%'
+                style='position:absolute;top:0;left:0;' allowfullscreen></iframe>
+    </div>
+    <br>
+    <button data-remodal-action="confirm" class="remodal-confirm">Close</button>
+</div>
+
+<div data-remodal-id="hit_ats">
+    <button data-remodal-action="close" class="remodal-close"></button>
+    <h1>QB Hit + Not ATS</h1>
+    <p>
+        In these cases, the QB is knocked to the ground for a QH after the throw and the initial pressure develops
+        quickly such that the play is not ATS.
+    </p>
+    <div style='position:relative; padding-bottom:calc(53.07% + 44px)'>
+        <iframe src='https://gfycat.com/ifr/DarkArcticBoubou' frameborder='0' scrolling='no' width='100%' height='100%'
+                style='position:absolute;top:0;left:0;' allowfullscreen></iframe>
+    </div>
+    <br>
+    <button data-remodal-action="confirm" class="remodal-confirm">Close</button>
+</div>
+
+<div data-remodal-id="sack_hit_ats">
+    <button data-remodal-action="close" class="remodal-close"></button>
+    <h1>Sack + QB Hit + Not ATS</h1>
+    <p>
+        These are the most common type of sacks. The QB goes to the ground (making it a QH) and the initial pressure
+        develops such that the play is not ATS.
+    </p>
+    <div style='position:relative; padding-bottom:calc(53.07% + 44px)'>
+        <iframe src='https://gfycat.com/ifr/DarkArcticBoubou' frameborder='0' scrolling='no' width='100%' height='100%'
+                style='position:absolute;top:0;left:0;' allowfullscreen></iframe>
+    </div>
+    <br>
+    <button data-remodal-action="confirm" class="remodal-confirm">Close</button>
+</div>
+
+<div data-remodal-id="ats">
+    <button data-remodal-action="close" class="remodal-close"></button>
+    <h1>ATS</h1>
+    <p>
+        These are the “all other” cases which constitute the bulk of ATS opportunities. The QB is not pressured, sacked,
+        or knocked down. In addition, the scorer judges that the pocket either did, or would have (in the case of quick
+        releases) held up for the full 3 seconds.
+    </p>
+    <div style='position:relative; padding-bottom:calc(53.07% + 44px)'>
+        <iframe src='https://gfycat.com/ifr/DarkArcticBoubou' frameborder='0' scrolling='no' width='100%' height='100%'
+                style='position:absolute;top:0;left:0;' allowfullscreen></iframe>
+    </div>
+    <br>
+    <button data-remodal-action="confirm" class="remodal-confirm">Close</button>
+</div>
+
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="remodal.min.js"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="venn.js"></script>
+<script>
+
+    let modals = {
+        'Sack': $('[data-remodal-id=sack]').remodal(),
+        'QB Hit': $('[data-remodal-id=hit]').remodal(),
+        'Not ATS': $('[data-remodal-id=not_ats]').remodal(),
+        'Sack|QB Hit': $('[data-remodal-id=sack_hit]').remodal(),
+        'Sack|Not ATS': $('[data-remodal-id=sack_ats]').remodal(),
+        'QB Hit|Not ATS': $('[data-remodal-id=hit_ats]').remodal(),
+        'Sack|QB Hit|Not ATS': $('[data-remodal-id=sack_hit_ats]').remodal(),
+        'ATS': $('[data-remodal-id=ats]').remodal(),
+    };
+
+    // define sets and set set intersections
+    let sets = [
+        {sets: ['Sack'], size: 12},
+        {sets: ['QB Hit'], size: 12},
+        {sets: ['Not ATS'], size: 12},
+        {sets: ['Sack', 'QB Hit'], size: 4},
+        {sets: ['Sack', 'Not ATS'], size: 4},
+        {sets: ['QB Hit', 'Not ATS'], size: 4},
+        {sets: ['Sack', 'QB Hit', 'Not ATS'], size: 2},
+        {sets: ['ATS'], size: 0.5},
+    ];
+
+    const width = $(window).width();
+    const dimension = width * 0.5;
+    let diagram = venn.VennDiagram()
+        .width(dimension)
+        .height(dimension);
+
+    let div = d3.select("#venn");
+    div.datum(sets).call(diagram);
+
+    d3.selectAll("#venn .venn-circle path")
+        .style("fill", '#241773')
+        .style("stroke", '#000000')
+        .style("fill-opacity", .6);
+
+    div.selectAll('g').style("cursor", 'pointer');
+
+    d3.selectAll("#venn text")
+        .style("fill", '#FFFFFF');
+
+    // add a tooltip
+    let tooltip = d3.select("body").append("div")
+        .attr("class", "venntooltip");
+
+    // add listeners to all the groups to display tooltip on mouseover
+    div.selectAll("g")
+        .on("mouseover", function (d, i) {
+            // sort all the areas relative to the current item
+            venn.sortAreas(div, d);
+            //
+            // // Display a tooltip with the current size
+            tooltip.transition().duration(400).style("opacity", 1.0);
+            tooltip.text(d.sets.join(' + '));
+            //
+            // // highlight the current path
+            var selection = d3.select(this).transition("tooltip").duration(300);
+            selection.select("path")
+                .style("stroke-width", 3)
+                .style("stroke", '#9E7C0C')
+                .style("fill-opacity", d.sets.length === 1 ? .9 : .5);
+        })
+
+        .on("mousemove", function () {
+            tooltip.style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+        })
+
+        .on("mouseout", function (d, i) {
+            tooltip.transition().duration(400).style("opacity", 0);
+            var selection = d3.select(this).transition("tooltip").duration(300);
+            selection.select("path")
+                .style("stroke-width", 1)
+                .style("stroke", '#000000')
+                .style("fill-opacity", d.sets.length === 1 ? .6 : .0);
+        })
+        .on('click', function (d, i) {
+            modals[d.sets.join('|')].open()
+        });
+
+</script>
+</html>
