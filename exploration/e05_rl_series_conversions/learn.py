@@ -141,9 +141,13 @@ class Learner:
                 if i % 500 == 0:
                     print('episode (series)', i)
 
-        np.savetxt('images/table.csv', Q, delimiter=',', fmt='%.5f')
+        df_Q = pd.DataFrame(data=Q,
+                            index=FootballSpace.STATES,
+                            columns=[action['type'] for action in FootballSpace.ACTIONS])
 
-        # np.savetxt('temp.csv', Q, delimiter=',', fmt='%.5f')
+        df_Q.to_csv('images/table_names.csv')
+
+        # np.savetxt('images/table.csv', Q, delimiter=',', fmt='%.5f')
 
         if self.verbose:
             print("Score over time: " + str(sum(rList) / num_series))
