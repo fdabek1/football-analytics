@@ -1,0 +1,2 @@
+class FootballSpace(Space):
+    pass
