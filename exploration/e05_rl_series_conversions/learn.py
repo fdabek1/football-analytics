@@ -1,9 +1,11 @@
-import gym
-import numpy as np
 import matplotlib.pyplot as plt
-import json
-
 import pandas as pd
+import numpy as np
+import json
+import gym
+import os
+
+from exploration.e05_rl_series_conversions.football_space import FootballSpace
 
 
 class Learner:
@@ -12,9 +14,13 @@ class Learner:
         self.show_graphs = show_graphs
         self.verbose = verbose
         self.df = None
-        # self.__load_series()
+        self.__load_series()
 
     def __load_series(self):
+        if os.path.exists('series.csv'):
+            self.df = pd.read_csv('series.csv')
+            return
+
         df = pd.read_csv('../../data/reg_pbp_2018_CarMel_RmvCol_for_firstdown_success.csv')
         max_yds_to_go = df['ydstogo'].max()
 
@@ -23,6 +29,7 @@ class Learner:
         ]
 
         df = df[df['down'].notnull()]
+        df['down'] = df['down'].astype(int)
         df = df.reset_index(drop=True)
 
         df['series_num'] = -1
@@ -71,56 +78,67 @@ class Learner:
         df.loc[df['series_num'] == -1, 'series_num'] = series_num
 
         self.df = df
+        self.df.to_csv('series.csv', index=False)
+
+    @staticmethod
+    def get_next_down_distance(series, current_index):
+        next_index = current_index + 1
+        if next_index >= len(series):
+            return series.iloc[0]['series_success'], None
+
+        next_play = series.iloc[next_index]
+        return next_play['down'], next_play['ydstogo']
 
     def learn(self, lr, y, e):
         gym.envs.register(id='FootballSpace-v1',
                           entry_point='dashboard_env:DashboardEnv',
-                          kwargs={'space': 1},
-                          timestep_limit=200)
+                          kwargs={'space': 1})
 
         env = gym.make('FootballSpace-v1')
 
         # Initialize table with all zeros
         Q = np.zeros([env.observation_space.n, env.action_space.n])
-        Q[:, :] = 10
+        Q[:, :] = 0
 
         # create lists to contain total rewards and steps per episode
         jList = []
         rList = []
         rTotalList = []
         rTotal = 0
+        num_series = self.df['series_num'].nunique()
+        print('Num Series', num_series)
         for i, series in self.df.groupby('series_num'):
-            print(series)
-            exit()
+            # print('')
+            # print('begin', i)
             # Reset environment and get first new observation
             s = env.reset()
             rAll = 0
-            d = False
-            j = 0
             # The Q-Table learning algorithm
-            while j < 99:
-                j += 1
-                # Choose an action by greedily (with noise) picking from Q table
-                # a = np.argmax(Q[s, :] + np.random.randn(1, env.action_space.n) *(1. / (i + 1)))
-
-                # Greedy Epsilon
-                a = np.random.randint(0, env.action_space.n) if np.random.rand() < e else np.argmax(Q[s, :])
+            for p, (_, play) in enumerate(series.iterrows()):
+                # Find action by play
+                a = FootballSpace.find_action(play)
 
                 # Get new state and reward from environment
-                s1, r, d, _ = env.step(a)
+                s1, r, d, _ = env.step((a, *(self.get_next_down_distance(series, p))))
+                # print(FootballSpace.find_state(s), FootballSpace.ACTIONS[a]['type'], r)
+
                 # Update Q-Table with new knowledge
+                # print('before', Q[s, a])
                 Q[s, a] += lr * (r + y * np.max(Q[s1, :]) - Q[s, a])
+                # print('after', Q[s, a])
                 rAll += r
                 rTotal += r
                 s = s1
-                if d:
-                    break
-            jList.append(j)
+
+            # if i == 3:
+            #     exit()
+
+            jList.append(len(series))
             rList.append(rAll)
             rTotalList.append(rTotal)
 
             if self.verbose:
-                if i % 100 == 0:
+                if i % 500 == 0:
                     print('episode (series)', i)
 
         np.savetxt('images/table.csv', Q, delimiter=',', fmt='%.5f')
@@ -128,7 +146,7 @@ class Learner:
         # np.savetxt('temp.csv', Q, delimiter=',', fmt='%.5f')
 
         if self.verbose:
-            print("Score over time: " + str(sum(rList) / self.num_episodes))
+            print("Score over time: " + str(sum(rList) / num_series))
             print("Average episode length: " + str(np.mean(jList)))
             print("Average last 50 episode length: " + str(np.mean(jList[-50:])))
             print("Final Q-Table Values")
@@ -172,33 +190,12 @@ class Learner:
         if self.save_files:
             plt.savefig('images/jSmooth.png')
 
-        if self.save_files:
-            with open('images/path.txt', 'w') as w:
-                w.write('Reward Right: ' + str(env.space.r_right) + '\n')
-                w.write('Reward Step: ' + str(env.space.r_step) + '\n')
-                w.write('\n')
-                w.write('\n')
-                # Get the optimal path
-                s = env.reset()
-                d = False
-                j = 0
-                # The Q-Table learning algorithm
-                while j < 99:
-                    j += 1
-                    a = np.argmax(Q[s, :])
-                    w.write(env.space.ACTIONS[a] + '\n')
-                    print(env.space.ACTIONS[a])
-                    s1, r, d, _ = env.step(a)
-                    s = s1
-                    if d:
-                        break
-
         return avg_j, avg_r
 
 
 def main():
     # Regular
-    learner = Learner(show_graphs=False, save_files=True, verbose=False)
+    learner = Learner(show_graphs=False, save_files=True, verbose=True)
     learner.learn(lr=0.85, y=0.99, e=0.05)
     exit()
 
