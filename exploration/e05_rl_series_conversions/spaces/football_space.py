@@ -2,46 +2,50 @@ class FootballSpace:
     STATES = []
     ACTIONS = [
         {
-            'type': 'penalty',
-            'reward': 0,
-        },
-        {
-            'type': 'fumble_lost',
+            'title': 'fumble_lost',
+            'columns': ['fumble_lost'],
             'reward': -7,
         },
         {
-            'type': 'touchdown',
-            'methods': ['pass_touchdown', 'rush_touchdown'],
+            'title': 'touchdown',
+            'columns': ['pass_touchdown', 'rush_touchdown'],
             'reward': 7,
         },
         {
-            'type': 'first_down',
-            'methods': ['first_down_rush', 'first_down_pass', 'first_down_penalty'],
+            'title': 'first_down',
+            'columns': ['first_down_rush', 'first_down_pass', 'first_down_penalty'],
             'reward': 3,
         },
         {
-            'type': 'interception',
+            'title': 'interception',
+            'columns': ['interception'],
             'reward': -7,
         },
         {
-            'type': 'safety',
+            'title': 'safety',
+            'columns': ['safety'],
             'reward': -2,
         },
         {
-            'type': 'field_goal',
+            'title': 'field_goal',
             'play_types': ['field_goal'],
             'reward': -1,
         },
         {
-            'type': 'punt',
+            'title': 'punt',
             'play_types': ['punt'],
             'reward': -3,
         },
         {
-            'type': 'regular',  # This needs to be last to be last one evaluated
+            'title': 'regular',  # This needs to be last to be last one evaluated
             'play_types': ['qb_spike', 'qb_kneel', 'pass', 'run'],
             'reward': 0,
-        }
+        },
+        {
+            'title': 'penalty',
+            'columns': ['penalty'],
+            'reward': 0,
+        },
     ]
 
     @classmethod
@@ -59,9 +63,9 @@ class FootballSpace:
             if 'play_types' in action:
                 if play['play_type'] in action['play_types'] and play['penalty'] == 0:
                     return i
-            elif 'methods' in action:
-                for method in action['methods']:
-                    if play[method] > 0:
+            elif 'columns' in action:
+                for col in action['columns']:
+                    if play[col] > 0:
                         return i
             elif play[action['type']] > 0:
                 return i

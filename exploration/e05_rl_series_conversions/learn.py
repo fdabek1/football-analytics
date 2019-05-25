@@ -121,7 +121,7 @@ class Learner:
 
                 # Get new state and reward from environment
                 s1, r, d, _ = env.step((a, *(self.get_next_down_distance(series, p))))
-                # print(FootballSpace.find_state(s), FootballSpace.ACTIONS[a]['type'], r)
+                # print(FootballSpace.find_state(s), FootballSpace.ACTIONS[a]['title'], r)
 
                 # Update Q-Table with new knowledge
                 # print('before', Q[s, a])
@@ -141,7 +141,7 @@ class Learner:
 
         df_Q = pd.DataFrame(data=Q,
                             index=FootballSpace.STATES,
-                            columns=[action['type'] for action in FootballSpace.ACTIONS])
+                            columns=[action['title'] for action in FootballSpace.ACTIONS])
 
         df_Q.to_csv('images/table_names.csv')
 
