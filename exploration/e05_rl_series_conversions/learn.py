@@ -106,6 +106,7 @@ class Learner:
         rTotalList = []
         rTotal = 0
         num_series = self.df['series_num'].nunique()
+        max_plays = self.df.groupby('series_num').size().max()
         print('Num Series', num_series)
         for i, series in self.df.groupby('series_num'):
             # print('')
@@ -130,9 +131,6 @@ class Learner:
                 rTotal += r
                 s = s1
 
-            # if i == 3:
-            #     exit()
-
             jList.append(len(series))
             rList.append(rAll)
             rTotalList.append(rTotal)
@@ -148,6 +146,34 @@ class Learner:
         df_Q.to_csv('images/table_names.csv')
 
         # np.savetxt('images/table.csv', Q, delimiter=',', fmt='%.5f')
+
+        print('Creating Ranked plays')
+        ranked_plays = []
+        for i, series in self.df.groupby('series_num'):
+            s = env.reset()
+            current_rewards = []
+            for p, (_, play) in enumerate(series.iterrows()):
+                # Find action by play
+                a = FootballSpace.find_action(play)
+
+                current_rewards.append(Q[s, a])
+
+                # Get new state and reward from environment
+                s1, r, d, _ = env.step((a, *(self.get_next_down_distance(series, p))))
+
+                s = s1
+
+            # current_rewards.append(Q[s, a])
+            ranked_plays.append(current_rewards)
+
+            if self.verbose:
+                if i % 500 == 0:
+                    print('episode (series)', i)
+
+        df_ranked_plays = pd.DataFrame(data=ranked_plays,
+                                       index=['series' + str(i + 1) for i in range(num_series)],
+                                       columns=['play' + str(i + 1) for i in range(max_plays)])
+        df_ranked_plays.to_csv('images/ranked_plays.csv')
 
         if self.verbose:
             print("Score over time: " + str(sum(rList) / num_series))
