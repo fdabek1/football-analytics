@@ -1,5 +1,5 @@
 from gym import Env, spaces
-from exploration.e05_rl_series_conversions.football_space import FootballSpace
+from exploration.e05_rl_series_conversions.spaces.space import FootballSpace
 
 
 class DashboardEnv(Env):

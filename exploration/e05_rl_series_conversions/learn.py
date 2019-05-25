@@ -5,7 +5,7 @@ import json
 import gym
 import os
 
-from exploration.e05_rl_series_conversions.football_space import FootballSpace
+from exploration.e05_rl_series_conversions.spaces.space import FootballSpace
 
 
 class Learner:
