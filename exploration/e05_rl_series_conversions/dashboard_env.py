@@ -1,6 +1,7 @@
 from gym import Env, spaces
 from exploration.e05_rl_series_conversions.spaces.football_space import FootballSpace
 from exploration.e05_rl_series_conversions.spaces.football_space1 import FootballSpace1
+from exploration.e05_rl_series_conversions.spaces.football_space2 import FootballSpace2
 
 
 class DashboardEnv(Env):
@@ -19,6 +20,8 @@ class DashboardEnv(Env):
             return FootballSpace()
         elif index == 1:
             return FootballSpace1()
+        elif index == 2:
+            return FootballSpace2()
 
     def find_action(self, play):
         return self.space.find_action(play)

@@ -113,7 +113,7 @@ class Learner:
         df.to_csv(filename, index=False)
 
     def learn(self, lr, y, e):
-        space_index = 1
+        space_index = 2
         folder = 'results/space' + str(space_index) + '/'
         gym.envs.register(id='FootballSpace-v1',
                           entry_point='dashboard_env:DashboardEnv',

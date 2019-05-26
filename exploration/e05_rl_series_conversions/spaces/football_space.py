@@ -67,8 +67,8 @@ class FootballSpace:
                 for col in action['columns']:
                     if play[col] > 0:
                         return i
-            elif play[action['type']] > 0:
-                return i
+            # elif play[action['type']] > 0:
+            #     return i
 
         raise ValueError('Unable to find action for this play:', play)
 
