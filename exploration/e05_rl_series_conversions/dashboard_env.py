@@ -1,5 +1,6 @@
 from gym import Env, spaces
 from exploration.e05_rl_series_conversions.spaces.football_space import FootballSpace
+from exploration.e05_rl_series_conversions.spaces.football_space1 import FootballSpace1
 
 
 class DashboardEnv(Env):
@@ -7,10 +8,20 @@ class DashboardEnv(Env):
 
     def __init__(self, space):
         FootballSpace.populate_states()
-        self.space = FootballSpace()
+        self.space = self.get_space(space)
         self.action_space = spaces.Discrete(self.space.get_num_actions())
         self.observation_space = spaces.Discrete(self.space.get_num_states())
         self.state = None
+
+    @staticmethod
+    def get_space(index):
+        if index == 0:
+            return FootballSpace()
+        elif index == 1:
+            return FootballSpace1()
+
+    def find_action(self, play):
+        return self.space.find_action(play)
 
     def step(self, data):
         a, play, next_down, next_distance = data

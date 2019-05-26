@@ -5,8 +5,6 @@ import json
 import gym
 import os
 
-from exploration.e05_rl_series_conversions.spaces.football_space import FootballSpace
-
 
 class Learner:
     def __init__(self, save_files=False, show_graphs=True, verbose=True):
@@ -90,10 +88,10 @@ class Learner:
         return next_play['down'], next_play['ydstogo']
 
     @staticmethod
-    def save_named_table(table, filename):
+    def save_named_table(table, filename, env):
         df = pd.DataFrame(data=table,
-                          index=FootballSpace.STATES,
-                          columns=[action['title'] for action in FootballSpace.ACTIONS])
+                          index=env.space.STATES,
+                          columns=[action['title'] for action in env.space.ACTIONS])
         df = df.reset_index()
 
         # Remove states success and fail
@@ -112,12 +110,14 @@ class Learner:
         columns.insert(1, 'distance')
         df = df.loc[:, columns]
 
-        df.to_csv(filename)
+        df.to_csv(filename, index=False)
 
     def learn(self, lr, y, e):
+        space_index = 1
+        folder = 'results/space' + str(space_index) + '/'
         gym.envs.register(id='FootballSpace-v1',
                           entry_point='dashboard_env:DashboardEnv',
-                          kwargs={'space': 1})
+                          kwargs={'space': space_index})
 
         env = gym.make('FootballSpace-v1')
 
@@ -141,7 +141,7 @@ class Learner:
             # The Q-Table learning algorithm
             for p, (_, play) in enumerate(series.iterrows()):
                 # Find action by play
-                a = FootballSpace.find_action(play)
+                a = env.find_action(play)
 
                 # Get new state and reward from environment
                 s1, r, d, _ = env.step((a, play, *(self.get_next_down_distance(series, p))))
@@ -162,13 +162,13 @@ class Learner:
                 if i % 500 == 0:
                     print('episode (series)', i)
 
-        self.save_named_table(Q, 'images/table_names.csv')
+        self.save_named_table(Q, folder + 'table_names.csv', env)
         Q_counts = np.sum(Q_counts, axis=1)
         Q_counts = Q_counts.reshape((Q_counts.shape[0], 1))
         Q_counts = np.repeat(Q_counts, Q.shape[1], axis=1)
-        self.save_named_table(Q / Q_counts, 'images/table_names_normalized.csv')
+        self.save_named_table(Q / Q_counts, folder + 'table_names_normalized.csv', env)
 
-        # np.savetxt('images/table.csv', Q, delimiter=',', fmt='%.5f')
+        # np.savetxt(folder + 'table.csv', Q, delimiter=',', fmt='%.5f')
 
         print('Creating Ranked plays')
         ranked_plays = []
@@ -177,7 +177,7 @@ class Learner:
             current_rewards = []
             for p, (_, play) in enumerate(series.iterrows()):
                 # Find action by play
-                a = FootballSpace.find_action(play)
+                a = env.find_action(play)
 
                 current_rewards.append(Q[s, a])
 
@@ -196,7 +196,7 @@ class Learner:
         df_ranked_plays = pd.DataFrame(data=ranked_plays,
                                        index=['series' + str(i + 1) for i in range(num_series)],
                                        columns=['play' + str(i + 1) for i in range(max_plays)])
-        df_ranked_plays.to_csv('images/ranked_plays.csv')
+        df_ranked_plays.to_csv(folder + 'ranked_plays.csv')
 
         if self.verbose:
             print("Score over time: " + str(sum(rList) / num_series))
@@ -226,7 +226,7 @@ class Learner:
             plt.show()
 
         if self.save_files:
-            plt.savefig('images/rSmooth.png')
+            plt.savefig(folder + 'rSmooth.png')
             plt.close()
 
         jList = movingaverage(jList, w_size)
@@ -241,7 +241,7 @@ class Learner:
             plt.show()
 
         if self.save_files:
-            plt.savefig('images/jSmooth.png')
+            plt.savefig(folder + 'jSmooth.png')
 
         return avg_j, avg_r
 
