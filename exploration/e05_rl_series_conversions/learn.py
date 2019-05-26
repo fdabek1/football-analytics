@@ -89,6 +89,31 @@ class Learner:
         next_play = series.iloc[next_index]
         return next_play['down'], next_play['ydstogo']
 
+    @staticmethod
+    def save_named_table(table, filename):
+        df = pd.DataFrame(data=table,
+                          index=FootballSpace.STATES,
+                          columns=[action['title'] for action in FootballSpace.ACTIONS])
+        df = df.reset_index()
+
+        # Remove states success and fail
+        df = df[~df['index'].isin(['success', 'fail'])]
+
+        # Split the state into down and distance columns
+        df['down'] = df['index'].str.split('|', n=1, expand=True)[0]
+        df['distance'] = df['index'].str.split('|', n=1, expand=True)[1]
+        df = df.drop(columns=['index'])
+
+        # Move down and distance to front of dataframe
+        columns = df.columns.tolist()
+        columns.remove('down')
+        columns.remove('distance')
+        columns.insert(0, 'down')
+        columns.insert(1, 'distance')
+        df = df.loc[:, columns]
+
+        df.to_csv(filename)
+
     def learn(self, lr, y, e):
         gym.envs.register(id='FootballSpace-v1',
                           entry_point='dashboard_env:DashboardEnv',
@@ -99,6 +124,7 @@ class Learner:
         # Initialize table with all zeros
         Q = np.zeros([env.observation_space.n, env.action_space.n])
         Q[:, :] = 0
+        Q_counts = np.zeros([env.observation_space.n, env.action_space.n])
 
         # create lists to contain total rewards and steps per episode
         jList = []
@@ -109,8 +135,6 @@ class Learner:
         max_plays = self.df.groupby('series_num').size().max()
         print('Num Series', num_series)
         for i, series in self.df.groupby('series_num'):
-            # print('')
-            # print('begin', i)
             # Reset environment and get first new observation
             s = env.reset()
             rAll = 0
@@ -121,12 +145,11 @@ class Learner:
 
                 # Get new state and reward from environment
                 s1, r, d, _ = env.step((a, *(self.get_next_down_distance(series, p))))
-                # print(FootballSpace.find_state(s), FootballSpace.ACTIONS[a]['title'], r)
 
                 # Update Q-Table with new knowledge
-                # print('before', Q[s, a])
                 Q[s, a] += lr * (r + y * np.max(Q[s1, :]) - Q[s, a])
-                # print('after', Q[s, a])
+                Q_counts[s, a] += 1
+
                 rAll += r
                 rTotal += r
                 s = s1
@@ -139,28 +162,11 @@ class Learner:
                 if i % 500 == 0:
                     print('episode (series)', i)
 
-        df_Q = pd.DataFrame(data=Q,
-                            index=FootballSpace.STATES,
-                            columns=[action['title'] for action in FootballSpace.ACTIONS])
-        df_Q = df_Q.reset_index()
-
-        # Remove states success and fail
-        df_Q = df_Q[~df_Q['index'].isin(['success', 'fail'])]
-
-        # Split the state into down and distance columns
-        df_Q['down'] = df_Q['index'].str.split('|', n=1, expand=True)[0]
-        df_Q['distance'] = df_Q['index'].str.split('|', n=1, expand=True)[1]
-        df_Q = df_Q.drop(columns=['index'])
-
-        # Move down and distance to front of dataframe
-        columns = df_Q.columns.tolist()
-        columns.remove('down')
-        columns.remove('distance')
-        columns.insert(0, 'down')
-        columns.insert(1, 'distance')
-        df_Q = df_Q.loc[:, columns]
-
-        df_Q.to_csv('images/table_names.csv')
+        self.save_named_table(Q, 'images/table_names.csv')
+        Q_counts = np.sum(Q_counts, axis=1)
+        Q_counts = Q_counts.reshape((Q_counts.shape[0], 1))
+        Q_counts = np.repeat(Q_counts, Q.shape[1], axis=1)
+        self.save_named_table(Q / Q_counts, 'images/table_names_normalized.csv')
 
         # np.savetxt('images/table.csv', Q, delimiter=',', fmt='%.5f')
 
