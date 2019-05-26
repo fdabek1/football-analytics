@@ -142,6 +142,23 @@ class Learner:
         df_Q = pd.DataFrame(data=Q,
                             index=FootballSpace.STATES,
                             columns=[action['title'] for action in FootballSpace.ACTIONS])
+        df_Q = df_Q.reset_index()
+
+        # Remove states success and fail
+        df_Q = df_Q[~df_Q['index'].isin(['success', 'fail'])]
+
+        # Split the state into down and distance columns
+        df_Q['down'] = df_Q['index'].str.split('|', n=1, expand=True)[0]
+        df_Q['distance'] = df_Q['index'].str.split('|', n=1, expand=True)[1]
+        df_Q = df_Q.drop(columns=['index'])
+
+        # Move down and distance to front of dataframe
+        columns = df_Q.columns.tolist()
+        columns.remove('down')
+        columns.remove('distance')
+        columns.insert(0, 'down')
+        columns.insert(1, 'distance')
+        df_Q = df_Q.loc[:, columns]
 
         df_Q.to_csv('images/table_names.csv')
 
