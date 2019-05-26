@@ -13,8 +13,8 @@ class DashboardEnv(Env):
         self.state = None
 
     def step(self, data):
-        a, next_down, next_distance = data
-        s, r, d = self.space.step(a, next_down, next_distance)
+        a, play, next_down, next_distance = data
+        s, r, d = self.space.step(a, play, next_down, next_distance)
         self.state = s
         return s, r, d, {}
 

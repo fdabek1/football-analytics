@@ -144,7 +144,7 @@ class Learner:
                 a = FootballSpace.find_action(play)
 
                 # Get new state and reward from environment
-                s1, r, d, _ = env.step((a, *(self.get_next_down_distance(series, p))))
+                s1, r, d, _ = env.step((a, play, *(self.get_next_down_distance(series, p))))
 
                 # Update Q-Table with new knowledge
                 Q[s, a] += lr * (r + y * np.max(Q[s1, :]) - Q[s, a])
@@ -182,7 +182,7 @@ class Learner:
                 current_rewards.append(Q[s, a])
 
                 # Get new state and reward from environment
-                s1, r, d, _ = env.step((a, *(self.get_next_down_distance(series, p))))
+                s1, r, d, _ = env.step((a, play, *(self.get_next_down_distance(series, p))))
 
                 s = s1
 

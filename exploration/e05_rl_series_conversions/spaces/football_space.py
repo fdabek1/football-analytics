@@ -87,14 +87,21 @@ class FootballSpace:
     def get_num_states(self):
         return len(self.STATES)
 
-    def step(self, a, next_down, next_distance):
+    @staticmethod
+    def get_reward(action, play):
+        if 'reward' in action:
+            return action['reward']
+
+        raise ValueError('Unable to identify reward.')
+
+    def step(self, a, play, next_down, next_distance):
         if next_distance is None:
             self.success = next_down
         else:
             self.down = next_down
             self.distance = next_distance
 
-        reward = self.ACTIONS[a]['reward']
+        reward = self.get_reward(self.ACTIONS[a], play)
         return self.get_state(), reward, False
 
     def get_state_string(self):
